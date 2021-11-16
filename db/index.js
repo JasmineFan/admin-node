@@ -1,28 +1,31 @@
 const mysql = require('mysql')
 const config = require('./config')
-const {debug} = require('../utils/constant')
-const {isObject} = require('../utils')
+const { debug, dbHost,dbUser,dbPwd } = require('../utils/constant')
+const { isObject } = require('../utils')
 
-function connect(){
+function connect() {
   return mysql.createConnection({
-    host:config.host,
-    user:config.user,
-    password:config.password,
-    database: config.database,
-    multipleStatements:true
+    // host: config.host,
+    // user: config.user,
+    // password: config.password,
+    host: dbHost,
+    user: dbUser,
+    password: dbPwd,
+    database: 'book',
+    multipleStatements: true
   })
 }
-function querySql(sql){
+function querySql(sql) {
   const conn = connect()
   debug && console.log(sql)
-  return new Promise((resolve,reject)=>{
+  return new Promise((resolve, reject) => {
     try {
-      conn.query(sql, (err,result)=>{
-        if(err) {
-          debug && console.log('查询失败，原因'+JSON.stringify(err))
+      conn.query(sql, (err, result) => {
+        if (err) {
+          debug && console.log('查询失败，原因' + JSON.stringify(err))
           reject(err)
         } else {
-          debug && console.log('查询成功'+JSON.stringify(result))
+          debug && console.log('查询成功' + JSON.stringify(result))
           resolve(result)
         }
       })
@@ -31,37 +34,37 @@ function querySql(sql){
     } finally {
       conn.end()
     }
-  })  
+  })
 }
 
-function queryOne(sql){
-  return new Promise((resolve, reject)=>{
-    querySql(sql).then(results=>{
-      if(results && results.length>0){
+function queryOne(sql) {
+  return new Promise((resolve, reject) => {
+    querySql(sql).then(results => {
+      if (results && results.length > 0) {
         resolve(results[0])
       } else {
         resolve(null)
       }
-    }).catch(err=>{
+    }).catch(err => {
       reject(err)
     })
   })
 }
 
-function insert(model, tableName){
-  return new Promise((resolve,reject)=>{
-    if(!isObject(model)){
+function insert(model, tableName) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(model)) {
       reject(new Error('插入数据库失败，插入数据非对象'))
     } else {
-      const keys=[]
-      const values =[]
-      Object.keys(model).forEach(key=>{
-        if(model.hasOwnProperty(key)){
+      const keys = []
+      const values = []
+      Object.keys(model).forEach(key => {
+        if (model.hasOwnProperty(key)) {
           keys.push(`\`${key}\``)
           values.push(`\'${model[key]}\'`)
         }
       })
-      if(keys.length>0 && values.length>0){
+      if (keys.length > 0 && values.length > 0) {
         let sql = `INSERT INTO \`${tableName}\` (`
         const keysString = keys.join(',')
         const valueString = values.join(',')
@@ -69,8 +72,8 @@ function insert(model, tableName){
         debug && console.log(sql)
         const conn = connect()
         try {
-          conn.query(sql,(err,result)=>{
-            if(err){
+          conn.query(sql, (err, result) => {
+            if (err) {
               reject(err)
             } else {
               resolve(result)
@@ -78,7 +81,7 @@ function insert(model, tableName){
           })
         } catch (error) {
           reject(error)
-        } finally{
+        } finally {
           conn.end()
         }
       } else {
@@ -87,26 +90,26 @@ function insert(model, tableName){
     }
   })
 }
-function update(model, tableName,where){
-  return new Promise((resolve,reject)=>{
-    if(!isObject(model)){
+function update(model, tableName, where) {
+  return new Promise((resolve, reject) => {
+    if (!isObject(model)) {
       reject(new Error("插入数据库失败，插入数据非对象"))
     } else {
       //update tablename set a=a,b=b where
-      const entry =[]
-      Object.keys(model).forEach(key=>{
-        if(model.hasOwnProperty(key)){
+      const entry = []
+      Object.keys(model).forEach(key => {
+        if (model.hasOwnProperty(key)) {
           entry.push(`\`${key}\`= '${model[key]}'`)
         }
       })
-      if(entry.length>0){
-        let sql= `UPDATE \`${tableName}\` SET`
+      if (entry.length > 0) {
+        let sql = `UPDATE \`${tableName}\` SET`
         sql = `${sql} ${entry.join(',')} ${where}`
         debug && console.log(sql)
         const conn = connect()
         try {
-          conn.query(sql,(err, result)=>{
-            if(err){
+          conn.query(sql, (err, result) => {
+            if (err) {
               reject(err)
             } else {
               resolve(result)
@@ -114,7 +117,7 @@ function update(model, tableName,where){
           })
         } catch (error) {
           reject(error)
-        } finally{
+        } finally {
           conn.end()
         }
       }
@@ -122,22 +125,22 @@ function update(model, tableName,where){
   })
 }
 
-function and(where, k,v){
-  if(where==='where'){
+function and(where, k, v) {
+  if (where === 'where') {
     return `${where} \`${k}\`='${v}'`
   } else {
     return `${where} and \`${k}\`='${v}'`
   }
 }
 
-function andLike(where, k,v){
-  if(where==='where'){
+function andLike(where, k, v) {
+  if (where === 'where') {
     return `${where} \`${k}\` like '%${v}%'`
   } else {
     return `${where} and \`${k}\` like '%${v}%'`
   }
 }
-module.exports = { 
+module.exports = {
   querySql,
   queryOne,
   insert,
