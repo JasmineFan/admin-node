@@ -11,9 +11,9 @@ if (env === 'dev') {
   dbUser = "root"
   dbPwd = "123456"
 }
-const UPLOAD_PATH = env === 'dev' ? '/javaLearn/upload' : 'root/upload/admin-upload'
-const OLD_UPLOAD_URL = env === 'dev' ? 'https://gotoplay.xyz/epub' : 'https://www.gotoplay.xyz'
-const UPLOAD_URL = env === 'dev' ? 'https://gotoplay.xyz' : 'https://www.gotoplay.xyz'
+const UPLOAD_PATH = env === 'dev' ? '/javaLearn/upload' : '/root/nginx/upload'
+const OLD_UPLOAD_URL = env === 'dev' ? 'https://gotoplay.xyz/epub' : 'http://www.test.studygood.top'
+const UPLOAD_URL = env === 'dev' ? 'https://gotoplay.xyz' : 'https://www.test.studygood.top'
 module.exports = {
   CODE_ERROR: -1,
   CODE_SUCCESS: 0,
